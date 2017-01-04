@@ -1,6 +1,6 @@
 function folders = project_paths()
 %project_paths   Define the set of folders to add to the MATLAB path
-%  
+%  aucunne modif
 %   Definition of the folders to add to the MATLAB path when this Project
 %   is opened, and remove from the path when it is closed. Edit the
 %   definition of folders below to add your own paths to the current
