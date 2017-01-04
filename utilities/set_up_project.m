@@ -1,6 +1,6 @@
 function set_up_project()
 %set_up_project  Configure the environment for this project
-%
+%ghg test
 %   Set up the environment for the current project. This function is set to
 %   Run at Startup.
 
