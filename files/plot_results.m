@@ -1,3 +1,4 @@
+% modification for git
 vc=valid_command.Data;
 c_time=commands.calculator_value_1.value.Time;
 c1=commands.calculator_value_1.value.Data;
