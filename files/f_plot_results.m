@@ -1,4 +1,5 @@
-% modification for git
+rvc=reference_valid_component.Data;
+rc=reference_command.Data;
 vc=valid_command.Data;
 c_time=commands.calculator_value_1.value.Time;
 c1=commands.calculator_value_1.value.Data;
@@ -14,6 +15,11 @@ r3=reference_trust.trusts.Data(1,3,:); r3=r3(:);
 r4=reference_trust.trusts.Data(1,4,:); r4=r4(:);
 r5=reference_trust.trusts.Data(1,5,:); r5=r5(:);
 r6=reference_trust.trusts.Data(1,6,:); r6=r6(:);
+
+close all;
+figure;
+figtitle('Commands, true command, related reference trust');
+set(gcf, 'Position', get(0, 'Screensize'));
 
 subplot(2,3,1);
 [ax h1 h2] = plotyy(c_time, [c1 vc], r_time, r1);
@@ -44,3 +50,12 @@ subplot(2,3,6);
 [ax h1 h2] = plotyy(c_time, [c6 vc], r_time, r6);
 set(h1(1), 'LineWidth', 3); set(h1(2), 'LineWidth', 2); set(h2, 'LineWidth', 2);
 title('Calculator 6')
+
+
+
+figure;
+figtitle('Most trusted calculator, referee command');
+set(gcf, 'Position', get(0, 'Screensize'));
+
+[ax h1 h2] = plotyy(c_time, [vc rc], c_time, rvc);
+set(h1(1), 'LineWidth', 3); set(h1(2), 'LineWidth', 2); set(h2, 'LineWidth', 2);
