@@ -134,7 +134,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 display('Starting simulation');
 set(handles.gui_status,'String','running');
-h = msgbox('Running simulation...','Importing Images','help');
+h = msgbox('Running simulation...','Information','help');
 child = get(h,'Children');
 delete(child(3));
 drawnow;
