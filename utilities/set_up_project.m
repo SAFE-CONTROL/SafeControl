@@ -11,7 +11,7 @@ p = slproject.getCurrentProject;
 
 projectRoot = p.RootFolder;
 % Set the location of slprj to be the "work" folder of the current project:
-myCacheFolder = fullfile(projectRoot, 'work');
+myCacheFolder = fullfile(projectRoot, 'files');
 if ~exist(myCacheFolder, 'dir')
     mkdir(myCacheFolder)
 end

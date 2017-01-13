@@ -22,7 +22,7 @@ function varargout = simulator_gui(varargin)
 
 % Edit the above text to modify the response to help simulator_gui
 
-% Last Modified by GUIDE v2.5 05-Jan-2017 14:34:25
+% Last Modified by GUIDE v2.5 12-Jan-2017 23:07:41
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -177,7 +177,7 @@ te=str2double(get(hObject,'String'));
 assert(~(isnan(te)) && ~(te<=0));
 
 % Update simulink model
-set_param('simulator','FixedStep',get(hObject,'String'));
+get_param('simulator','FixedStep')
 
 % Save GUI state
 save_state(handles);
@@ -513,6 +513,17 @@ if (exist('state.mat','file')==2)
         set(handles.simparam_duration,'String',state.simparam_duration);
         simparam_duration_Callback(handles.simparam_duration, [], handles);
     end
+    if (isfield(state,'simparam_timeflow'))
+        display('... simparam_timeflow_loaded');
+        radiobutton_handle=findall(get(handles.simparam_timeflow,'Child'),'Tag',state.simparam_timeflow)
+        if(isempty(radiobutton_handle)==0)
+            set(radiobutton_handle,'Value', 1);
+            display('BOUUUUUUUUUUUUUUUUUUUUU')
+            eventdata.NewValue = radiobutton_handle
+            
+            simparam_timeflow_SelectionChangeFcn(handles.simparam_timeflow, eventdata, handles);
+        end
+    end
     
     % Trust parameters
     if (isfield(state,'trustparam_rebuild_duration'))
@@ -562,6 +573,7 @@ function save_state(handles)
 % to be exported in a MAT-File
 state.simparam_te=get(handles.simparam_te,'String');
 state.simparam_duration=get(handles.simparam_duration,'String');
+state.simparam_timeflow=get(get(handles.simparam_timeflow,'SelectedObject'),'Tag');
 
 state.trustparam_rebuild_duration=get(handles.trustparam_rebuild_duration,'String');
 state.trustparam_lose_duration=get(handles.trustparam_lose_duration,'String');
@@ -572,3 +584,24 @@ state.resultsparam_export_png=get(handles.resultsparam_export_png,'Value');
 state.resultsparam_plot=get(handles.resultsparam_plot,'Value');
 
 save('state.mat','state');
+
+
+
+% --- Executes when selected object is changed in simparam_timeflow.
+function simparam_timeflow_SelectionChangeFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in simparam_timeflow 
+% eventdata  structure with the following fields (see UIBUTTONGROUP)
+%	EventName: string 'SelectionChanged' (read only)
+%	OldValue: handle of the previously selected object or empty if none was selected
+%	NewValue: handle of the currently selected object
+% handles    structure with handles and user data (see GUIDATA)
+display('Time flow button radio selection changed');
+
+switch(get(eventdata.NewValue,'Tag'))
+    case 'simparam_timeflow_max'
+        assignin ('base','rt_sync',0);
+    case 'simparam_timeflow_realtime'
+        assignin ('base','rt_sync',1);
+end
+
+save_state(handles)
