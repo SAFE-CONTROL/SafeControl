@@ -22,7 +22,7 @@ function varargout = simulator_gui(varargin)
 
 % Edit the above text to modify the response to help simulator_gui
 
-% Last Modified by GUIDE v2.5 12-Jan-2017 23:07:41
+% Last Modified by GUIDE v2.5 19-Jan-2017 15:29:07
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -112,10 +112,6 @@ else
     % We set default values and execute callbacks to update simulink
     % model
     display('loading default values');
-    set(handles.simparam_te, 'String', '0.010');
-    simparam_te_Callback(handles.simparam_te, [], handles);
-    set(handles.simparam_duration, 'String', '80');
-    simparam_duration_Callback(handles.simparam_duration, [], handles);
 end
 
 % set(handles.unitgroup, 'SelectedObject', handles.english);
@@ -599,9 +595,54 @@ display('Time flow button radio selection changed');
 
 switch(get(eventdata.NewValue,'Tag'))
     case 'simparam_timeflow_max'
-        assignin ('base','rt_sync',0);
+        assignin ('base','RT_SYNC',0);
     case 'simparam_timeflow_realtime'
-        assignin ('base','rt_sync',1);
+        assignin ('base','RT_SYNC',1);
 end
 
-save_state(handles)
+save_state(handles);
+
+
+% --------------------------------------------------------------------
+function open_scenario_Callback(hObject, eventdata, handles)
+% hObject    handle to open_scenario (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[FileName,PathName,FilterIndex] = uigetfile('.mat');
+
+if(FileName ~= 0)
+    set(handles.scenario_file,'String',[PathName FileName]);
+    load([PathName FileName]); % charge le fichier scenario en memoire
+    
+    if(exist('scenario'))
+        handles.scenario=scenario;
+        guidata(hObject,handles);
+        set(handles.pushbutton_visualize_scenario,'Enable','On');
+    end
+    
+    te = scenario.reference_command.Time(2) - scenario.reference_command.Time(1);
+    duration = scenario.reference_command.Time(end);
+    set(handles.simparam_te,'String',num2str(te));
+    set(handles.simparam_duration,'String',num2str(duration));
+    simparam_te_Callback(handles.simparam_te, [], handles);
+    simparam_duration_Callback(handles.simparam_duration, [], handles);
+    save_state(handles);
+end
+
+
+% --- Executes on button press in pushbutton_visualize_scenario.
+function pushbutton_visualize_scenario_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_visualize_scenario (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% charge la variable scenario dans le workspace MATLAB avant d'ouvrir la
+% GUI de visualisation de scenario
+assignin('base','scenario',handles.scenario);
+scenario_visualizer_gui
+
+% --------------------------------------------------------------------
+function reset_settings_Callback(hObject, eventdata, handles)
+% hObject    handle to reset_settings (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
