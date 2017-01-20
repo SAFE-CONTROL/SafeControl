@@ -44,6 +44,7 @@ end
 % End initialization code - DO NOT EDIT
 
 
+
 % --- Executes just before simulator_gui is made visible.
 function simulator_gui_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
@@ -64,6 +65,7 @@ initialize_gui(hObject, handles, false);
 % uiwait(handles.figure1);
 
 
+
 % --- Outputs from this function are returned to the command line.
 function varargout = simulator_gui_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
@@ -73,6 +75,7 @@ function varargout = simulator_gui_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
+
 
 
 % --- Executes during object creation, after setting all properties.
@@ -95,6 +98,8 @@ display('simulator opened');
 % add a handle to wksp values
 handles.simulator_wksp = get_param('simulator','ModelWorkspace');
 guidata(hObject,handles);
+
+
 
 function initialize_gui(fig_handle, handles, isreset)
 % If the simdata field is present and the reset flag is false, it means
@@ -123,13 +128,26 @@ end
 % Update handles structure
 guidata(handles.figure1, handles);
 
+
+
 % --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 display('Starting simulation');
-set(handles.gui_status,'String','running');
+% set(handles.gui_status,'String','running');
+% h_waitbar = waitbar(0,'1','Running simulation...',...
+%                     'CreateCancelBtn',...
+%                     'cancelSimulation');
+
+% Add the waitbar handle to handles
+% handles.h_waitbar = h_waitbar;
+% guidata(hObject, handles);
+
+% Add the variable 'canceling' to the handle of the waitbar
+% setappdata(h_waitbar,'canceling',0);
+
 h = msgbox('Running simulation...','Information','help');
 child = get(h,'Children');
 delete(child(3));
@@ -137,11 +155,14 @@ drawnow;
 set_param('simulator','SimulationCommand','start');
 set(handles.gui_status,'String','idle');
 drawnow;
-delete(h);
+
+delete(h); % DELETE the waitbar; don't try to CLOSE it.
 
 % progress bar
 %h=waitbar(x);
 %set(h,'windowstyle','modal');
+
+
 
 function simparam_te_Callback(hObject, eventdata, handles)
 % hObject    handle to simparam_te (see GCBO)
