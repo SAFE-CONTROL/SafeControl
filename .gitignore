@@ -1,0 +1,9 @@
+#############
+## Matlab
+#############
+files/failsafe_tests/scenarios/
+slprj/
+*_win64
+*.rxw64
+*.mexw64
+*.autosave

@@ -30,16 +30,16 @@ diffs=abs(diff(ts.Data,1,diff_dim));
 D=zeros(length(ts.Data),1);
 
 if(nb_dims==1)
-    display('case 1: timeseries of scalars');
+    %display('case 1: timeseries of scalars');
     D(2:end)=diffs;
 elseif(nb_dims==2)
-    display('case 2 : timeseries of vectors');
+    %display('case 2 : timeseries of vectors');
     temp_diffs=sum(diffs,2);
     for i=1:length(diffs)
         D(i+1)=temp_diffs(i,:);
     end
 elseif(nb_dims==3)
-    display('case 3 : timeseries of matrices');
+    %display('case 3 : timeseries of matrices');
     temp_diffs=sum(diffs,1);
     temp_diffs=sum(temp_diffs,2);
     for i=1:length(diffs)        

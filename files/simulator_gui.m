@@ -1,4 +1,5 @@
 function varargout = simulator_gui(varargin)
+
 % SIMULATOR_GUI MATLAB code for simulator_gui.fig
 %      SIMULATOR_GUI, by itself, creates a new SIMULATOR_GUI or raises the existing
 %      singleton*.
@@ -22,7 +23,7 @@ function varargout = simulator_gui(varargin)
 
 % Edit the above text to modify the response to help simulator_gui
 
-% Last Modified by GUIDE v2.5 19-Jan-2017 15:29:07
+% Last Modified by GUIDE v2.5 24-Jan-2017 13:59:31
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -94,7 +95,8 @@ end
 %close_system('simulator',0);
 %open_system('simulator');
 load_system('simulator');
-display('simulator opened');
+%display('simulator opened');
+
 % add a handle to wksp values
 handles.simulator_wksp = get_param('simulator','ModelWorkspace');
 guidata(hObject,handles);
@@ -105,18 +107,19 @@ function initialize_gui(fig_handle, handles, isreset)
 % If the simdata field is present and the reset flag is false, it means
 % we are we are just re-initializing a GUI by calling it from the cmd line
 % while it is up. So, bail out as we dont want to reset the data.
-display('initialization');
+%display('initialization');
 
 if isfield(handles, 'simdata') && ~isreset
     return;
 end
 
 if(exist('state.mat','file')==2) % TO BE CHANGED
-    handles=load_state(handles);
+    handles=load_state(handles,'state.mat');
 else
     % We set default values and execute callbacks to update simulink
     % model
-    display('loading default values');
+    %display('loading default values');
+    handles=load_state(handles,'defaults.mat');
 end
 
 % set(handles.unitgroup, 'SelectedObject', handles.english);
@@ -130,12 +133,13 @@ guidata(handles.figure1, handles);
 
 
 
-% --- Executes on button press in pushbutton1.
-function pushbutton1_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton1 (see GCBO)
+% --- Executes on button press in pushbutton_run.
+function pushbutton_run_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton_run (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-display('Starting simulation');
+%display('Starting simulation');
+
 % set(handles.gui_status,'String','running');
 % h_waitbar = waitbar(0,'1','Running simulation...',...
 %                     'CreateCancelBtn',...
@@ -148,9 +152,10 @@ display('Starting simulation');
 % Add the variable 'canceling' to the handle of the waitbar
 % setappdata(h_waitbar,'canceling',0);
 
+
 h = msgbox('Running simulation...','Information','help');
 child = get(h,'Children');
-delete(child(3));
+delete(child(3)); % remove button from msgbox
 drawnow;
 set_param('simulator','SimulationCommand','start');
 set(handles.gui_status,'String','idle');
@@ -171,7 +176,8 @@ function simparam_te_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of simparam_te as text
 %        str2double(get(hObject,'String')) returns contents of simparam_te as a double
-display('Te changed');
+%display('Te changed');
+
 str=get(hObject,'String');
 te=str2double(str);
 valid_input=true;
@@ -222,7 +228,8 @@ function simparam_duration_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of simparam_duration as text
 %        str2double(get(hObject,'String')) returns contents of simparam_duration as a double
-display('Duration changed');
+%display('Duration changed');
+
 str=get(hObject,'String');
 duration=str2double(str);
 valid_input=true;
@@ -277,7 +284,8 @@ function trustparam_rebuild_duration_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of trustparam_rebuild_duration as text
 %        str2double(get(hObject,'String')) returns contents of trustparam_rebuild_duration as a double
-display('Rebuild duration changed');
+%display('Rebuild duration changed');
+
 str=get(hObject,'String');
 rebuild_duration=str2double(str);
 te=str2double(get(handles.simparam_te,'String'));
@@ -299,7 +307,7 @@ end
 
 rebuild_duration=str2double(str);
 assignin(handles.simulator_wksp,'incStep',te/rebuild_duration);
-%getVariable(handles.simulator_wksp,'incStep') % FOR DEBUG PURPOSES
+%getVariable(handles.simulator_wksp,'incStep') % FOR handles.verbose_mode PURPOSES
 
 % Save GUI state
 save_state(handles);
@@ -327,7 +335,8 @@ function trustparam_lose_duration_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of trustparam_lose_duration as text
 %        str2double(get(hObject,'String')) returns contents of trustparam_lose_duration as a double
-display('Lose duration changed');
+%display('Lose duration changed');
+
 str=get(hObject,'String');
 lose_duration=str2double(str);
 te=str2double(get(handles.simparam_te,'String'));
@@ -356,9 +365,6 @@ save_state(handles);
 
 
 
-function isValidLoseDuration()
-% 
-
 % --- Executes during object creation, after setting all properties.
 function trustparam_lose_duration_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to trustparam_lose_duration (see GCBO)
@@ -380,8 +386,9 @@ function resultsparam_export_png_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of resultsparam_export_png
-display('Export to .png');
-display(get(handles.resultsparam_export_png,'Value'));
+%display('Export to .png');
+%display(get(handles.resultsparam_export_png,'Value'));
+
 assignin(handles.simulator_wksp,'export_png',get(handles.resultsparam_export_png,'Value'));
 save_state(handles);
 
@@ -394,8 +401,9 @@ function resultsparam_plot_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of resultsparam_plot
-display('Plot changed');
-display(get(handles.resultsparam_plot,'Value'));
+%display('Plot changed');
+%display(get(handles.resultsparam_plot,'Value'));
+
 assignin(handles.simulator_wksp,'plot_results',get(handles.resultsparam_plot,'Value'));
 save_state(handles);
 
@@ -408,8 +416,9 @@ function resultsparam_export_matfile_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of resultsparam_export_matfile
-display('Export to MAT-File changed');
-display(get(handles.resultsparam_export_matfile,'Value'));
+%display('Export to MAT-File changed');
+%display(get(handles.resultsparam_export_matfile,'Value'));
+
 assignin(handles.simulator_wksp,'export_matfile',get(handles.resultsparam_export_matfile,'Value'));
 save_state(handles);
 
@@ -422,7 +431,7 @@ function trustparam_cap_decrease_ratio_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of trustparam_cap_decrease_ratio as text
 %        str2double(get(hObject,'String')) returns contents of trustparam_cap_decrease_ratio as a double
-display('Cap decrease ratio changed');
+%display('Cap decrease ratio changed');
 
 str=get(hObject,'String');
 cap_decrease_ratio=str2double(str);
@@ -468,43 +477,41 @@ end
 
 
 
-% --- Executes on button press in pushbutton3.
-function pushbutton3_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton3 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-load_system('simulator')
-
-
-
 % --- Executes on button press in pushbutton_reset_to_default.
 function pushbutton_reset_to_default_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton_reset_to_default (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-display('Reset parameters to default values...');
-display('... simparam_te loaded');
+%display('Reset parameters to default values...');
+%display('... simparam_te loaded');
+
 set(handles.simparam_te,'String','0.01');
 simparam_te_Callback(handles.simparam_te, [], handles);
-display('... simparam_duration loaded');
+%display('... simparam_duration loaded');
+
 set(handles.simparam_duration,'String','100');
 simparam_duration_Callback(handles.simparam_duration, [], handles);
-display('... trustparam_rebuild_duration loaded');
+%display('... trustparam_rebuild_duration loaded');
+
 set(handles.trustparam_rebuild_duration,'String','5');
 trustparam_rebuild_duration_Callback(handles.trustparam_rebuild_duration, [], handles);
-display('... trustparam_lose_duration loaded');
+%display('... trustparam_lose_duration loaded');
+
 set(handles.trustparam_lose_duration,'String','0.1');
 trustparam_lose_duration_Callback(handles.trustparam_lose_duration, [], handles);
-display('... trustparam_cap_decrease_ratio');
+%display('... trustparam_cap_decrease_ratio');
+
 set(handles.trustparam_cap_decrease_ratio,'String','10');
 trustparam_cap_decrease_ratio_Callback(handles.trustparam_cap_decrease_ratio, [], handles);
-display('... resultsparam_export_matfile');
+%display('... resultsparam_export_matfile');
+
 set(handles.resultsparam_export_matfile,'Value',1);
 resultsparam_export_matfile_Callback(handles.resultsparam_export_matfile, [], handles);
-display('... resultsparam_export_png');
+%display('... resultsparam_export_png');
+
 set(handles.resultsparam_export_png,'Value',1);
 resultsparam_export_png_Callback(handles.resultsparam_export_png, [], handles);
-display('... resultsparam_plot');
+%display('... resultsparam_plot');
 set(handles.resultsparam_plot,'Value',1);
 resultsparam_plot_Callback(handles.resultsparam_plot, [], handles);
 
@@ -513,30 +520,33 @@ save_state(handles);
 
 
 
-function handles=load_state(handles)
+function handles=load_state(handles, settings_file)
 %retrieve the data
-if (exist('state.mat','file')==2)
-    display('Loading state...');
-    load('state.mat');
+if (exist(settings_file,'file')==2)
+    %display('Loading state...');
+    
+    load(settings_file);
     
     % Simulation parameters
     if (isfield(state,'simparam_te'))
-        display('... simparam_te loaded');
+        %display('... simparam_te loaded');
+        
         set(handles.simparam_te,'String',state.simparam_te);
         simparam_te_Callback(handles.simparam_te, [], handles);
     end
     if (isfield(state,'simparam_duration'))
-        display('... simparam_duration loaded');
+        %display('... simparam_duration loaded');
+        
         set(handles.simparam_duration,'String',state.simparam_duration);
         simparam_duration_Callback(handles.simparam_duration, [], handles);
     end
     if (isfield(state,'simparam_timeflow'))
-        display('... simparam_timeflow_loaded');
-        radiobutton_handle=findall(get(handles.simparam_timeflow,'Child'),'Tag',state.simparam_timeflow)
+        %display('... simparam_timeflow_loaded');
+        
+        radiobutton_handle=findall(get(handles.simparam_timeflow,'Child'),'Tag',state.simparam_timeflow);
         if(isempty(radiobutton_handle)==0)
             set(radiobutton_handle,'Value', 1);
-            display('BOUUUUUUUUUUUUUUUUUUUUU')
-            eventdata.NewValue = radiobutton_handle
+            eventdata.NewValue = radiobutton_handle;
             
             simparam_timeflow_SelectionChangeFcn(handles.simparam_timeflow, eventdata, handles);
         end
@@ -544,39 +554,44 @@ if (exist('state.mat','file')==2)
     
     % Trust parameters
     if (isfield(state,'trustparam_rebuild_duration'))
-        display('... trustparam_rebuild_duration loaded');
+        %display('... trustparam_rebuild_duration loaded');
+        
         set(handles.trustparam_rebuild_duration,'String',state.trustparam_rebuild_duration);
         trustparam_rebuild_duration_Callback(handles.trustparam_rebuild_duration, [], handles);
     end
     if (isfield(state,'trustparam_lose_duration'))
-        display('... trustparam_lose_duration loaded');
+        %display('... trustparam_lose_duration loaded');
+        
         set(handles.trustparam_lose_duration,'String',state.trustparam_lose_duration);
         trustparam_lose_duration_Callback(handles.trustparam_lose_duration, [], handles);
     end
     if (isfield(state,'trustparam_cap_decrease_ratio'))
-        display('... trustparam_cap_decrease_ratio');
+        %display('... trustparam_cap_decrease_ratio');
+        
         set(handles.trustparam_cap_decrease_ratio,'String',state.trustparam_cap_decrease_ratio);
         trustparam_cap_decrease_ratio_Callback(handles.trustparam_cap_decrease_ratio, [], handles);
     end
     
     % Results parameters
     if (isfield(state,'resultsparam_export_matfile'))
-        display('... resultsparam_export_matfile');
+        %display('... resultsparam_export_matfile');
         set(handles.resultsparam_export_matfile,'Value',state.resultsparam_export_matfile);
         resultsparam_export_matfile_Callback(handles.resultsparam_export_matfile, [], handles);
     end
     if (isfield(state,'resultsparam_export_png'))
-        display('... resultsparam_export_png');
+        %display('... resultsparam_export_png');
+        
         set(handles.resultsparam_export_png,'Value',state.resultsparam_export_png);
         resultsparam_export_png_Callback(handles.resultsparam_export_png, [], handles);
     end
     if (isfield(state,'resultsparam_plot'))
-        display('... resultsparam_plot');
+        %display('... resultsparam_plot');
+        
         set(handles.resultsparam_plot,'Value',state.resultsparam_plot);
         resultsparam_plot_Callback(handles.resultsparam_plot, [], handles);
     end
 else
-    display('No state file found');
+    %display('No state file found');
 end
     
 %load the data to the uicomponents
@@ -612,7 +627,7 @@ function simparam_timeflow_SelectionChangeFcn(hObject, eventdata, handles)
 %	OldValue: handle of the previously selected object or empty if none was selected
 %	NewValue: handle of the currently selected object
 % handles    structure with handles and user data (see GUIDATA)
-display('Time flow button radio selection changed');
+%display('Time flow button radio selection changed');
 
 switch(get(eventdata.NewValue,'Tag'))
     case 'simparam_timeflow_max'
@@ -624,32 +639,6 @@ end
 save_state(handles);
 
 
-% --------------------------------------------------------------------
-function open_scenario_Callback(hObject, eventdata, handles)
-% hObject    handle to open_scenario (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-[FileName,PathName,FilterIndex] = uigetfile('.mat');
-
-if(FileName ~= 0)
-    set(handles.scenario_file,'String',[PathName FileName]);
-    load([PathName FileName]); % charge le fichier scenario en memoire
-    
-    if(exist('scenario'))
-        handles.scenario=scenario;
-        guidata(hObject,handles);
-        set(handles.pushbutton_visualize_scenario,'Enable','On');
-    end
-    
-    te = scenario.reference_command.Time(2) - scenario.reference_command.Time(1);
-    duration = scenario.reference_command.Time(end);
-    set(handles.simparam_te,'String',num2str(te));
-    set(handles.simparam_duration,'String',num2str(duration));
-    simparam_te_Callback(handles.simparam_te, [], handles);
-    simparam_duration_Callback(handles.simparam_duration, [], handles);
-    save_state(handles);
-end
-
 
 % --- Executes on button press in pushbutton_visualize_scenario.
 function pushbutton_visualize_scenario_Callback(hObject, eventdata, handles)
@@ -660,10 +649,70 @@ function pushbutton_visualize_scenario_Callback(hObject, eventdata, handles)
 % charge la variable scenario dans le workspace MATLAB avant d'ouvrir la
 % GUI de visualisation de scenario
 assignin('base','scenario',handles.scenario);
-scenario_visualizer_gui
+scenario_visualizer_gui;
 
-% --------------------------------------------------------------------
-function reset_settings_Callback(hObject, eventdata, handles)
-% hObject    handle to reset_settings (see GCBO)
+
+% --- If Enable == 'on', executes on mouse press in 5 pixel border.
+% --- Otherwise, executes on mouse press in 5 pixel border or over pushbutton_run.
+function pushbutton_run_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to pushbutton_run (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+
+% --------------------------------------------------------------------
+function reset_to_defaults_Callback(hObject, eventdata, handles)
+% hObject    handle to reset_to_defaults (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+load_state(handles,'defaults.mat');
+
+
+% --------------------------------------------------------------------
+function settings_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to settings (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function open_scenario_Callback(hObject, eventdata, handles)
+% hObject    handle to open_scenario (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[FileName,PathName,FilterIndex] = uigetfile('.mat');
+
+if(FileName ~= 0)
+    load([PathName FileName]); % charge le fichier scenario en memoire
+    assignin('base','scenario',scenario);
+    
+    if(exist('scenario','var'))
+        assignin(handles.simulator_wksp,'scenario_name',FileName);
+        set(handles.scenario_file,'String',[PathName FileName]);
+        handles.scenario=scenario;
+        guidata(hObject,handles);
+        set(handles.pushbutton_visualize_scenario,'Enable','On');
+        set(handles.pushbutton_run,'Enable','On');
+        
+        te = scenario.reference_command.Time(2) - scenario.reference_command.Time(1);
+        duration = scenario.reference_command.Time(end);
+        set(handles.simparam_te,'String',num2str(te));
+        set(handles.simparam_duration,'String',num2str(duration));
+        simparam_te_Callback(handles.simparam_te, [], handles);
+        simparam_duration_Callback(handles.simparam_duration, [], handles);
+        save_state(handles);
+    else
+        errordlg(['Scenario file ' FileName ' found but variable ''scenario'' not found.']);
+    end
+elseif(FileName)
+    errordlg(['Scenario file ' FileName ' not found.']);
+end
+
+
+% --------------------------------------------------------------------
+function exit_gui_Callback(hObject, eventdata, handles)
+% hObject    handle to exit_gui (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+delete(handles.figure1);

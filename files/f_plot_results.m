@@ -1,61 +1,64 @@
-rvc=referee_valid_calculator.Data;
-rc=referee_command.Data; rc=rc(:);
-vc=reference_command.Data;
-c_time=commands.Time;
-c1=commands.Data(1,:,:); c1=c1(:);
-c2=commands.Data(2,:,:); c2=c2(:);
-c3=commands.Data(3,:,:); c3=c3(:);
-c4=commands.Data(4,:,:); c4=c4(:);
-c5=commands.Data(5,:,:); c5=c5(:);
-c6=commands.Data(6,:,:); c6=c6(:);
-r_time=referee_trusts.Time;
-r1=referee_trusts.Data(1,1,:); r1=r1(:);
-r2=referee_trusts.Data(1,2,:); r2=r2(:);
-r3=referee_trusts.Data(1,3,:); r3=r3(:);
-r4=referee_trusts.Data(1,4,:); r4=r4(:);
-r5=referee_trusts.Data(1,5,:); r5=r5(:);
-r6=referee_trusts.Data(1,6,:); r6=r6(:);
+function f_plot_results(export_matfile, export_png, plot_results, scenario_name)
 
 close all;
+
+% Prepare calculators related variables
+for i=1:6
+    i_str = num2str(i);
+    
+    % execute >> cX = commands.Data(X,:,:);
+    evalin('base', ['c' i_str ' = commands.Data(' i_str ',:,:);']);
+    % execute >> cX = c(:);
+    evalin('base', ['c' i_str ' = c' i_str '(:);']);
+    % execute >> rX = referee_trusts.Data(1,X,:);
+    evalin('base', ['r' i_str ' = referee_trusts.Data(1,' i_str ',:);']);
+    % execute >> rX = rX(:);
+    evalin('base', ['r' i_str ' = r' i_str '(:);']);
+end
+
 figure;
-figtitle('Commands, true command, related reference trust');
+figtitle('Calculators commands vs reference command ; and referee trust in calculators');
 set(gcf, 'Position', get(0, 'Screensize'));
 
-subplot(2,3,1);
-[ax h1 h2] = plotyy(c_time, [c1 vc], r_time, r1);
-set(h1(1), 'LineWidth', 3); set(h1(2), 'LineWidth', 2); set(h2, 'LineWidth', 2);
-title('Calculator 1')
+% Plotting calculators related data
+for i=1:6
+    i_str = num2str(i);
+    
+    evalin('base', ['subplot(2,3,' i_str ');']);
+    evalin('base', ['[ax h1 h2] = plotyy(commands.Time, [c' i_str ' reference_command.Data], referee_trusts.Time, r' i_str ');']);
+    evalin('base', 'set(h1(1), ''LineWidth'', 3);');
+    evalin('base', 'set(h1(2), ''LineWidth'', 2);');
+    evalin('base', 'set(h2, ''LineWidth'', 2);');
+    evalin('base', ['title(''Calculator ' i_str ''');']);
+    
+    legend('Calculator command', 'Reference command', 'Referee trust', 'Location', 'SouthWest');
+    grid on;
+    evalin('base', 'ylabel(ax(1),''Command [V]'');');
+    evalin('base', 'ylabel(ax(2),''Trust'');');
+    xlabel('Time [s]');
+end
 
-subplot(2,3,2);
-[ax h1 h2] = plotyy(c_time, [c2 vc], r_time, r2);
-set(h1(1), 'LineWidth', 3); set(h1(2), 'LineWidth', 2); set(h2, 'LineWidth', 2);
-title('Calculator 2')
-
-subplot(2,3,3);
-[ax h1 h2] = plotyy(c_time, [c3 vc], r_time, r3);
-set(h1(1), 'LineWidth', 3); set(h1(2), 'LineWidth', 2); set(h2, 'LineWidth', 2);
-title('Calculator 3')
-
-subplot(2,3,4);
-[ax h1 h2] = plotyy(c_time, [c4 vc], r_time, r4);
-set(h1(1), 'LineWidth', 3); set(h1(2), 'LineWidth', 2); set(h2, 'LineWidth', 2);
-title('Calculator 4')
-
-subplot(2,3,5);
-[ax h1 h2] = plotyy(c_time, [c5 vc], r_time, r5);
-set(h1(1), 'LineWidth', 3); set(h1(2), 'LineWidth', 2); set(h2, 'LineWidth', 2);
-title('Calculator 5')
-
-subplot(2,3,6);
-[ax h1 h2] = plotyy(c_time, [c6 vc], r_time, r6);
-set(h1(1), 'LineWidth', 3); set(h1(2), 'LineWidth', 2); set(h2, 'LineWidth', 2);
-title('Calculator 6')
-
-
+% Export to png if needed
+if(export_png)
+    disp('Exporting png...');
+    scenario_name=scenario_name(1:end-4)
+    eval(['mkdir ' scenario_name]);
+    
+    set(gcf, 'PaperPositionMode','auto')   
+    eval(['print(''-dpng'',''' scenario_name '\calculators_plot.png'');']);
+end
 
 figure;
 figtitle('Most trusted calculator, referee command');
 set(gcf, 'Position', get(0, 'Screensize'));
 
-[ax h1 h2] = plotyy(c_time, [vc rc], c_time, rvc);
+[ax h1 h2] = evalin('base','plotyy(commands.Time, [referee_command.Data(:) reference_command.Data], commands.Time, referee_valid_calculator.Data);');
 set(h1(1), 'LineWidth', 3); set(h1(2), 'LineWidth', 2); set(h2, 'LineWidth', 2);
+legend('Referee output command', 'Reference command', 'Index of calculator elected by the referee', 'Location', 'Best');
+grid on;
+
+% Export to png
+if(export_png)
+    set(gcf, 'PaperPositionMode','auto')   
+    eval(['print(''-dpng'',''' scenario_name '\referee_plot.png'');']);
+end
