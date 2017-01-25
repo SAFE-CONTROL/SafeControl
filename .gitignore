@@ -7,3 +7,5 @@ slprj/
 *.rxw64
 *.mexw64
 *.autosave
+*.asv
+files/state.mat
